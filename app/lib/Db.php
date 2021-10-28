@@ -92,72 +92,178 @@ class Db
       Db::query("UPDATE $table SET $colum = '$values' WHERE id = '$id' ");
     }
 
-    public function plusLike($colum, $values, $id)
+    public function emptyFields($name, $email, $login, $pass)
     {
-      Db::query("UPDATE `posts` SET $colum = '$values' WHERE id = '$id'");
-    }
+      if (!empty($name) && !empty($email) && !empty($login) && !empty($pass)){
+        return true;
+      }else{
+        $this->db->message('error', 'Empty fields');
+      }
+    } 
 
-    public function minusLike($colum, $values, $id)
+    public function validTitle($title)
     {
-      Db::query("UPDATE `posts` SET $colum = '$values' WHERE id = '$id'");
+      if (strlen($title) > 20  && strlen($title) <= 5) {
+        Db::message('error', 'Product name must be no more than 20 characters');
+      }
     }
 
-    public function nameValidate($nameLen) // Валидация имени
-  {
-    if ($nameLen < 3 or $nameLen > 100) {
-      Db::message('error', 'The name must be at least 3 and no more than 100 and characters');
-    }else{
-      return true;
+    public function validSmallDes($smallD)
+    {
+      if (strlen($smallD) < 5  && strlen($smallD) >= 30) {
+        Db::message('error', 'Product description must be no more than 30 characters');
+      }
     }
-  }
 
-  public function descriptionValidate($descriptionLen)
-  {
-    if ($descriptionLen < 3 or $descriptionLen > 1000) {
-      Db::message('error', 'The description must be at least 3 and no more than 1000 and characters');
-    }else{
-      return true;
+    public function validFullDes($fullD)
+    {
+      if (strlen($fullD) < 10  && strlen($fullD) >= 1) {
+        Db::message('error', 'Product description must be more than 40 characters');
+      }
     }
-  }
 
-  public function textValidate($textLen)
-  {
-    if ($textLen < 10 or $textLen > 5000) {
-      Db::message('error', 'The text must be at least 100 and no more than 5000 and characters');
-    }else{
-      return true;
+    public function validPrice($price)
+    {
+      if (strlen($price) < 1 && strlen($price) >= 10) {
+        Db::message('error', 'Product price must be no more than 10 characters');
+      }
     }
-  }
 
-  public function editName($name, $id)
-  {
-    if (!empty($name)) {
-      Db::nameValidate(iconv_strlen($name));
-      Db::update('posts', 'name', $name, $id);
-    }else{
-      Db::message('error', 'The name field is empty');
+    public function validate_name($username)
+    {
+      if (strlen($username) >= 3 && strlen($username) <= 15){
+      }else{
+        Db::message('error', 'The name must be at least 3 characters and no more than 15');
+      }
+      if (1 >= Db::find("SELECT * FROM users WHERE username = '$username'")){
+      }else{
+        Db::message('error', 'This name is already taken, choose another login');
+      }
     }
-  }
 
-  public function editDescription($description, $id)
-  {
-    if (!empty($description)) {
-      Db::descriptionValidate(iconv_strlen($description));
-      Db::update('posts', 'description', $description, $id);
-    }else{
-      Db::message('error', 'The description field is empty');
+    public function validate_mail($email)
+    {
+      if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+      }else{
+        Db::message('error', 'Invalid email');
+      }
     }
-  }
 
-  public function editText($text, $id)
-  {
-    if (!empty($text)) {
-      Db::textValidate(iconv_strlen($text));
-      Db::update('posts', 'text', $text, $id);// обновляет значение 1.имя таблици 2.колонка 3.новое значение 4.id 
-    }else{
-      Db::message('error', 'The text field is empty');
+    public function validate_login($login)
+    {
+      if (Db::find("SELECT * FROM users WHERE login = '$login'") == 0) {
+        if (strlen($login) == 10 || strlen($login) == 12) {
+          return true;
+        }else{
+          Db::message('error', 'This number is not correct');
+        }
+      }else{
+        Db::message('error', 'This number is already taken');
+      }
     }
-  }
+
+    public function validate_password($password)
+    {
+      if (strlen($password) > 4 && strlen($password) < 15) {
+      }else{
+        Db::message('error', 'The password must be at least 4 characters and no more than 15');
+      }
+    }
+
+
+    public function editTitle($title, $id)
+    {
+      if (!empty($title)) {
+        Db::validTitle(iconv_strlen($title));
+        Db::update('product', 'title', $title, $id);
+      }else{
+        Db::message('error', 'The name field is empty');
+      }
+    }
+
+    public function editSmallDescr($smallD, $id)
+    {
+      if (!empty($smallD)) {
+        Db::validTitle(iconv_strlen($smallD));
+        Db::update('product', 'smallDeckr', $smallD, $id);
+      }else{
+        Db::message('error', 'The name field is empty');
+      }
+    }
+
+    public function editFullDescr($fullD, $id)
+    {
+      if (!empty($fullD)) {
+        Db::validTitle(iconv_strlen($fullD));
+        Db::update('product', 'fullDeckr', $fullD, $id);
+      }else{
+        Db::message('error', 'The name field is empty');
+      }
+    }
+
+    public function editPrice($price, $id)
+    {
+      if (!empty($price)) {
+        Db::validTitle(iconv_strlen($price));
+        Db::update('product', 'price', $price, $id);
+      }else{
+        Db::message('error', 'The name field is empty');
+      }
+    }
+
+    public function addimg($id)
+    {
+      if ($_FILES['img']['name'] == '') {
+        Db::message('error', 'You need added picture');
+      }
+      $img = $_FILES['img']['name'];
+      list($imgname, $type) = explode(".", $img);
+      move_uploaded_file($_FILES['img']['tmp_name'], 'public/img/'.$id.".".$type);
+      return "$id"."."."$type";
+    }
+
+    public function addProductToDb($post, $userid)// проводим валидацию и отправляем данные в бд
+    {
+      Db::validTitle($post['title']);
+      Db::validSmallDes($post['smallDeckr']);
+      Db::validFullDes($post['fullDeckr']);
+      Db::validPrice($post['price']);
+
+      $lastid = Db::getMaxIdPlus('product');
+
+      $img = Db::addimg($lastid);
+
+      $params = [
+        'id' => $lastid,
+        'title' => $post['title'],
+        'smallDeckr' => $post['smallDeckr'],
+        'fullDeckr' => $post['fullDeckr'],
+        'price' => $post['price'],
+        'cat' => $post['category'],
+        'userid' =>  $userid,
+        'avatar' => $img,
+      ];
+
+      if ($post != []) {
+
+        Db::query('INSERT INTO product VALUES (:id, :title, :smallDeckr, :fullDeckr, :price, :cat, :userid, :avatar)', $params);
+        return Db::lastInsertId();
+      }
+    }
+
+    public function editDbProduct($post)
+    {
+      $id = $post['id']; 
+      $title = $post['title'];
+      $smalldescr = $post['smallDeckr'];
+      $fullldescr = $post['fullDeckr'];
+      $price = $post['price'];
+
+      Db::editTitle($title, $id);
+      Db::editSmallDescr($smalldescr, $id);
+      Db::editFullDescr($fullldescr, $id);
+      Db::editPrice($price, $id);
+    }
 
 
 }

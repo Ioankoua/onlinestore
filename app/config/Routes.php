@@ -17,65 +17,76 @@ return [
 
 	'' => [
 		'controller' => 'main',
-		'action' => 'post',
+		'action' => 'mainPage',
 	],
 
-	'fullpost' => [
+	'search' => [
 		'controller' => 'main',
-		'action' => 'fullpost',
+		'action' => 'search',
 	],
 
-	'like' => [
+	'category' =>  [
 		'controller' => 'main',
-		'action' => 'like',
+		'action' => 'category',
 	],
 
-	'coment' => [
+	'cat/product' =>  [
 		'controller' => 'main',
-		'action' => 'coment',
-	],
-
-	'exit' => [
-		'controller' => 'main',
-		'action' => 'exit',
+		'action' => 'productCat',
 	],
 
 //UserController
 
-	'account/addpost' => [
+	'account/add' => [
 		'controller' => 'user',
-		'action' => 'addpost',
+		'action' => 'addProduct',
 	],
 
-	'account/editpost' => [
+	'account/settings' => [
 		'controller' => 'user',
-		'action' => 'editpost',
+		'action' => 'personalSettings',
 	],
 
-	'account/fullpost' => [
+	'account/exit' => [
 		'controller' => 'user',
-		'action' => 'fullpost',
+		'action' => 'exitAcc',
 	],
 
-	'account/myposts' => [
+	'account/myproduct' => [
 		'controller' => 'user',
-		'action' => 'myposts',
-	],
-	'account/deletepost' => [
-		'controller' => 'user',
-		'action' => 'deletepost',
+		'action' => 'myProduct',
 	],
 
-	'account/buttonedit' => [
+	'account/product/edit' => [
 		'controller' => 'user',
-		'action' => 'buttonedit',
+		'action' => 'editProduct',
 	],
 
-//AdminCotroller
+	'account/product/delete' => [
+		'controller' => 'user',
+		'action' => 'deleteProduct',
+	],
+
+	'account/product/cat' => [
+		'controller' => 'user',
+		'action' => 'myProductCat',
+	],
+
+//AdminController
 
 	'admin/login' => [
 		'controller' => 'admin',
 		'action' => 'login',
+	],	
+
+	'admin/products' => [
+		'controller' => 'admin',
+		'action' => 'adminMain',
+	],
+
+	'admin/product' => [
+		'controller' => 'admin',
+		'action' => 'oneProduct',
 	],
 
 	'admin/logout' => [
@@ -85,50 +96,47 @@ return [
 
 	'admin/add' => [
 		'controller' => 'admin',
-		'action' => 'add',
+		'action' => 'addProduct',
 	],
 
 	'admin/edit' => [
 		'controller' => 'admin',
-		'action' => 'edit',
-	],
-
-	'admin/enter_edit' => [
-		'controller' => 'admin',
-		'action' => 'enter_edit',
-	],
-
-	'admin/button_enter_edit' => [
-		'controller' => 'admin',
-		'action' => 'button_enter_edit',
+		'action' => 'editProduct',
 	],
 
 	'admin/delete' => [
 		'controller' => 'admin',
-		'action' => 'delete',
+		'action' => 'deleteProduct',
 	],
 
-	'admin/deleteComment' => [
+	'admin/search' => [
 		'controller' => 'admin',
-		'action' => 'deleteComment',
+		'action' => 'searchAdmin',
 	],
 
-	'admin/delete_button' => [
+	'admin/addcategory' => [
 		'controller' => 'admin',
-		'action' => 'delete_button',
+		'action' => 'addCategory',
 	],
 
-	'admin/post' => [
+	'admin/category' => [
 		'controller' => 'admin',
-		'action' => 'admin_post',
+		'action' => 'categoryAdmin',
 	],
 
-	'admin/text_post' => [
+	'admin/cat' => [
 		'controller' => 'admin',
-		'action' => 'text_post',
+		'action' => 'catAdmin',
 	],
 
+	'admin/cat/edit' => [
+		'controller' => 'admin',
+		'action' => 'editCat',
+	],
 
+	'admin/cat/delete' => [
+		'controller' => 'admin',
+		'action' => 'deleteCat',
+	],
 
 ];
-

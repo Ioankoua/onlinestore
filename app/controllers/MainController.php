@@ -7,43 +7,62 @@ use app\lib\Db;
 
 class MainController extends Controller
 {
-	public function postAction()
+	public function mainPageAction()
 	{	
-		$result = $this->model->getAllPosts();
+		$product = $this->model->getProducts();
+		$cats = $this->model->getAllCategory();
 		$vars = [
-			'posts' => $result,
+			'product' => $product,
+			'cats' => $cats,
 		];
-		$this->view->render('Post', $vars);
+
+		$this->view->render('OStore', $vars);
 	}
 
-	public function fullpostAction()
-	{	
-		$result = $this->model->getFullPosts($_POST['idpost']);
-		$comment = $this->model->getComent($_POST['idpost']);
+	public function productAction()
+	{
+		$result = $this->model->getProduct($_GET['id']);
+		$cats = $this->model->getAllCategory();
 		$vars = [
-			'posts' => $result,
-			'comments' => $comment,
+			'product' => $result,
+			'cats' => $cats,
 		];
-		$this->view->render('Fullpost', $vars);
+		$this->view->render('OStore', $vars);
 	}
 
-	public function likeAction()
+	public function searchAction()
 	{
-		$this->model->makeLike($_POST);
-		
-		?> <script type="text/javascript">window.history.back()</script><?
+		$result = $this->model->searchSimilar($_POST['search']);
+		$cats = $this->model->getAllCategory();
+		$vars = [
+			'product' => $result,
+			'cats' => $cats,
+		];
+		$this->view->render('OStore', $vars);
 	}
 
-	public function comentAction()
+	public function categoryAction()
 	{
-		$this->model->addComent($_POST);
+		$result = $this->model->getAllCategory();
+		$vars = [
+			'cats' => $result,
+		];
 
-		?> <script type="text/javascript">window.history.back()</script><?
+		$this->view->render('Category', $vars);
 	}
 
-	public function exitAction()
-	{	
-		unset($_SESSION['auth']);
-		$this->view->redirect('/');
+	public function productCatAction()
+	{
+		$result = $this->model->getProductsCategory($_POST['cat']);
+		$cats = $this->model->getAllCategory();
+		$vars = [
+			'product' => $result,
+			'cats' => $cats,
+		];
+		$this->view->render('Category', $vars);
 	}
+
+
+
+
 }

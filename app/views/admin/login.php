@@ -1,9 +1,8 @@
-
-<div class="container">
+<div style="margin-left: 30vw;">
     <div class="card card-login mx-auto mt-5" style="width: 50vw;">
         <div class="card-header">Login to the admin panel</div>
         <div class="card-body">
-            <form action="/admin/login" method="post"  id="ajax">
+            <form action="/admin/login" method="post" id="ajax">
                 <div class="form-group">
                     <label>Login</label>
                     <input class="form-control" type="text" name="login">

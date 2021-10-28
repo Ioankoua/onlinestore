@@ -1,69 +1,69 @@
 body{
 	margin: 0;
-}
-
-.myheader{
-	display: flex;
-	height: 10vh;
-	width: 100vw;
-	background-color: #EBEAEA;
-}
-
-.my_meny{
-	display: flex;
-}
-
-.mydefault_content{
-	background-color: #FEF6F6;
 	position: absolute;
-	min-height: 90vh;
-	width: 100vw;
+	overflow-x: hidden;
+}
+
+.nobutton {
+  background: none!important;
+  border: none;
+  padding: 0!important;
+  /*optional*/
+  font-family: arial, sans-serif;
+  /*input has OS specific font-family*/
+  color: #069;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.cat-list{
+	min-height: 200px; 
+	background-color: #f7f5f5; 
+	width: 250px; 
+	position: absolute; 
+	margin-top: -5vh;
+}
+
+.cat-title{
+	margin-left: 4.5vw; 
+	margin-top: 2vh; 
+	color: blue; font-family: italic;
+}
+
+.cat-list a{ 
+	text-decoration: none;
+}
+
+.cat-elemnt{
+	padding: 5px;
 }
 
 .my_content{
-	margin-top: 10vh;
 	margin-left: 15vw;
-	margin-right: 10vw;
-	background-color: #FEF6F6;
+	width: 85vw;
+	min-height: 90vh;
 }
 
-.title_text{
+.goods{
+	max-width: 70vw;
 	margin-left: 10vw;
-	font-size: 18px;
+	display: flex;
+  	flex-wrap: wrap;
+  	justify-content: left;
 }
 
-.input_post{
-	opacity: 0;
+.my_tittle{
+	margin-left: 15vw;
+	margin-top: 5vh;
+}
+
+.my_form{
+	margin-left: 10vw;
+	margin-top: 5vh;
+}
+
+.secret{
 	height: 1px;
 	width: 1px;
-}
-
-.author{
-	margin-left: 5vw;
-	font-size: 18px;
-	font-style: italic;
-}
-
-.comments_content{
-	margin-left: 3vw;
-	margin-right: 5vw;
-	margin-bottom: 5vh;
-}
-
-.comments_block{
-	background-color: #C5EEE0;
-	padding: 15px;
-	margin-bottom: 1vw;
-	margin-top: 1vw;
-}
-
-.add_comment{
-	margin-top: 2vh;
-}
-
-.mytext{
-	margin-left: 6px;
-	font-size: 13px;
-	font-style: italic;
-	opacity: 0.9;
+	opacity: 0;
 }

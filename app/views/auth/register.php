@@ -1,14 +1,13 @@
-<div class="my_content" style="margin-left: 30vw;">
-	<div class="title_text">
-		<p>Here you can register your account</p>
-	</div>
+<div class="my_tittle">
+	<h5>If you want to publish your products, you need to register</h5>
+</div>
 
-	<div class="block_form">
+<div class="my_form">
 		<form action="/register" method="post" id="ajax">
 
 			<div class="form-group" style="width: 40vw; margin-top: 1vh;">
 				<label class="message_word">Name</label>
-				<input type="text" name="name"class="form-control" placeholder="Random name">
+				<input type="text" name="username"class="form-control" placeholder="Random name">
 			</div>
 
 			<div class="form-group" style="width: 40vw; margin-top: 1vh;">
@@ -23,7 +22,7 @@
 
 			<div class="form-group" style="width: 40vw; margin-top: 1vh;">
 				<label class="message_word">Password</label>
-				<input type="text" name="password"class="form-control" placeholder="pass123">
+				<input type="password" name="password"class="form-control" placeholder="pass123">
 			</div>
 
 			<div class="form_button_position" style="margin-top: 2vh;">
@@ -31,5 +30,4 @@
 			</div>
 			
 		</form>
-	</div>
 </div>

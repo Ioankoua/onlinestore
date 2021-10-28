@@ -2,21 +2,20 @@
 
 return [
 	'all' => [
-		'post',
-		'fullpost',
+		'mainPage',
+		'product',
+		'product/{id:\d+}',
+		'search',
+		'category',
+		'productCat',
 	],
 	'auth' => [
-		'like',
-		'coment',
-		'exit',
-		
+
 	],	
 	'guest' => [
 
 	],
 	'admin' => [
-		'like',
-		'coment',
-		'exit',
+
 	],
 ];

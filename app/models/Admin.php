@@ -16,193 +16,97 @@ class Admin extends Model
 		}
 	}
 
-	public function getAllPosts()
+	public function getProducts()
     {
-      return $this->db->findall('SELECT id, name, description, text, goodlike, dislike, author FROM posts ORDER BY id DESC;');
+      return $this->db->findall('SELECT * FROM product ORDER BY id DESC;');
     }
 
-    public function getFullPosts($id)
+    public function getProduct($id)
     {
-      return $this->db->findall("SELECT id, name, description, text, goodlike, dislike, author FROM posts WHERE id = '$id'");
+      return $this->db->findall("SELECT * FROM product WHERE id = '$id'");
     }
 
-    public function getComent($ispost)
+    public function getAllCategory()
+    {
+    	return $this->db->findall('SELECT * FROM category ORDER BY id DESC;');
+    }
+
+    public function getOneCategory($id)
+    {
+    	return $this->db->findall("SELECT * FROM category WHERE id = '$id'");
+    }
+
+    public function getProductsCategory($cat)
+    {
+    	return $this->db->findall("SELECT * FROM product WHERE cat = '$cat' ORDER BY id DESC;");
+    }
+
+    public function addAdmin($post)// проводим валидацию и отправляем данные в бд
 	{
-	  return  $this->db->findall("SELECT id, author, message, ispost FROM comments WHERE ispost = '$ispost'");
+		$this->db->addProductToDb($post, '0');
 	}
 
-	public function emptyFields($post) // Проверка на пустые поля
+	public function addImgcat($id)
 	{
-		$idLen = iconv_strlen($post['id']);
-		if (isset($post['name'])) {
-			$nameLen = iconv_strlen($post['name']);
+		if ($_FILES['catimg']['name'] == '') {
+			Db::message('error', 'You need added picture');
 		}
-
-		if ($nameLen >= 1 or $idLen >= 1) {
-			return true;
-		}else{
-			$this->db->message('error', 'empty fields');
-		}
+		$img = $_FILES['catimg']['name'];
+		list($imgname, $type) = explode(".", $img);
+		move_uploaded_file($_FILES['catimg']['tmp_name'], 'public/catimg/'.$id.".".$type);
+		return "$id"."."."$type";
 	}
 
-	public function postValidate($post) 
+	public function addCat($post)
 	{
-		$nameLen = iconv_strlen($post['name']);
-		$descriptionLen = iconv_strlen($post['description']);
-		$textLen = iconv_strlen($post['text']);
-		
-		$this->db->nameValidate($nameLen);
-		$this->db->descriptionValidate($descriptionLen);
-		$this->db->textValidate($textLen);
-		
-		if (empty($_FILES['img']['tmp_name'])) {
-			$this->db->message('error', 'Need picture');
-			return false;
-		}
-		
-		return true;
+	  $lastid = $this->db->getMaxIdPlus('category');
+
+	  $img = Admin::addImgcat($lastid);
+
+      $params = [
+        'id' => $lastid,
+        'cat' => $post['cat'],
+        'catdesc' => $post['catdesc'],
+        'catimg' => $img,
+      ];
+
+      if ($post != []) {
+        $this->db->query('INSERT INTO category VALUES (:id, :cat, :catdesc, :catimg)', $params);  
+      }
+
 	}
 
-	public function postAdd($post) 
-	{		
-		$lastid = $this->db->getMaxIdPlus('posts');
-
-		$params = [
-			'id' => $lastid,
-			'name' => $post['name'],
-			'description' => $post['description'],
-			'text' => $post['text'],
-			'goodlike' => '0',
-			'dislike' =>  '0',
-			'author' => 'admin',
-		];
-		//setcookie('res',$lastid.$post['name'].$post['description'].$post['text'].$like.$dis.'admin', time() +100);
-		$this->db->query('INSERT INTO `posts` VALUES (:id, :author, :name, :description, :goodlike, :dislike, :text)', $params);
-		
-		return $lastid;
-	}
-
-	public function addimg($path, $id)
+	public function editAdmin($post)
 	{
-		move_uploaded_file($path, 'public/img/'.$id.'.jpg');
+		$this->db->editDbProduct($post);	
 	}
 
-	public function deletePost($post)
+	public function editCatAdmin($post)
 	{
-		$id = $post['id'];
-		if (isset($post['name'])) {
-			$name = $post['name'];
-		}
+		$id = $post['id']; 
+		$cat = $post['cat'];
+		$catdesc = $post['catdesc'];
 
-		if (!empty($id)) {
-			$result = $this->db->getId('posts', $id);
-			if ($result == true) {
-				$this->db->deleteColum('posts', $id);
-			}else{
-				$this->db->message('error', 'No such id exists');
-			}			
-		}
-
-		if (!empty($name)) {
-			$id = $this->db->getNameId('posts', $name);
-			if ($id == true) {
-				$this->db->deleteColum('posts', $id);
-			}else{
-				$this->db->message('error', 'No such name exists');
-			}			
-		}	
+		$this->db->update('category', 'cat', $cat, $id);
+		$this->db->update('category', 'catdesc', $catdesc, $id);
 	}
 
-	public function deleteComm($post)
+	public function delete($post, $table)
 	{
 		$id = $post['id'];
 
 		if (!empty($id)) {
-			$result = $this->db->getId('comments', $id);
+			$result = $this->db->getId($table, $id);
 			if ($result == true) {
-				$this->db->deleteColum('comments', $id);
+				$this->db->deleteColum($table, $id);
 			}else{
 				$this->db->message('error', 'No such id exists');
 			}			
 		}
 	}
 
-	public function getPost()// Берет один пост через сесию
-	{
-		$id = $_SESSION['id']; 
-		$post = $this->db->findall("SELECT name, description, text, goodlike, dislike, author FROM posts WHERE id = '$id'");
-		return $post;
-	}
-
-	public function enterEdit($post)
-	{
-		$id = $post['id'];
-		if (isset($post['name'])) {
-			$name = $post['name'];
-		}
-
-		if (!empty($id)) {
-			$result = $this->db->getId('posts', $id);
-			if ($result == true) {
-				return $id;
-			}else{
-				$this->db->message('error', 'No such id exists');
-			}			
-		}
-
-		if (!empty($name)) {
-			$id = $this->db->getNameId('posts', $name);
-			if ($id == true) {
-				return $id;
-			}else{
-				$this->db->message('error', 'No such name exists');
-			}			
-		}
-	}
-
-	public function editLike($like, $id)
-	{
-		if (!empty($like)) {
-			$this->db->update('posts', 'goodlike', $like, $id);
-		}else{
-			$this->db->message('error', 'The like field is empty');
-		}
-	}
-
-	public function editDis($dis, $id)
-	{
-		if (!empty($dis)) {
-			$this->db->update('posts', 'dislike', $dis, $id);
-		}else{
-			$this->db->message('error', 'The dislike field is empty');
-		}
-	}
-
-	public function editAuthor($author, $id)
-	{
-		if (!empty($author)) {
-			$this->db->update('posts', 'author', $author, $id);
-		}else{
-			$this->db->message('error', 'The author field is empty');
-		}
-	}
-
-	public function editPost($post)
-	{
-		$id = $_SESSION['id']; 
-		$name = $post['name'];
-		$description = $post['description'];
-		$text = $post['text'];
-		$like = $post['goodlike'];
-		$dis = $post['dislike'];
-		$author = $post['author'];
-
-		$this->db->editName($name, $id);
-		$this->db->editDescription($description, $id);
-		$this->db->editText($text, $id);		
-		Admin::editLike($like, $id);
-		Admin::editDis($dis, $id);
-		Admin::editAuthor($author, $id);
-	}
-		
+	public function searchSimilar($query)
+    {
+    	return $this->db->findall("SELECT * FROM product WHERE title LIKE '%$query%'");
+    }
 }

@@ -2,19 +2,19 @@
 
 return [
 	'all' => [
-
+		
 	],
 	'auth' => [
-		'addpost',
-		'myposts',
-		'fullpost',
-		'editpost',
-		'buttonedit',
-		'deletepost'
+		'addProduct',
+		'exitAcc',
+		'myProduct',
+		'deleteProduct',
+		'editProduct',
+		'myProductCat',
+		'personalSettings',
 	],
-	
 	'guest' => [
-
+		
 	],
 	'admin' => [
 

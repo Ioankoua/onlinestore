@@ -10,121 +10,137 @@ class AdminController extends Controller
 	public function __construct($route)
 	{
 		parent::__construct($route);
-		$this->view->layout = 'admin_template';
+		$this->view->layout = 'admin';
 	}
 
 	public function loginAction()// Вход в панель админа
 	{	
 		if (isset($_SESSION['admin'])){
-			$this->view->redirect('../admin/add');
+			$this->view->redirect('../admin/products');
 		}
 		if (!empty($_POST)){
 			if ($this->model->loginValidate($_POST)){
 				$_SESSION['admin'] = true;
 				unset($_SESSION['auth']);
-				$this->view->location('/admin/add');
+				$this->view->location('/admin/products');
 			}
 		}
 
 		$this->view->render('Login');
 	}
 
-	public function addAction()// Добавление новых постов
+	public function adminMainAction() // Ввывод всех постов сокращеном варианте
 	{	
-		if (!empty($_POST)){
-			$this->model->postValidate($_POST);
-			$id = $this->model->postAdd($_POST);
-
-			if (!$id) {
-				$this->view->message('error', 'Picture no add');
-			}
-			$this->model->addimg($_FILES['img']['tmp_name'], $id);
-
-			$this->view->message('success', 'id: '.$id);
-		}
-
-		$this->view->render('Add');
-	}
-
-	public function enter_editAction() // Вход в режим редактора через навигацию
-	{
-		if (!empty($_POST)){
-			$this->model->emptyFields($_POST);
-			$id = $this->model->enterEdit($_POST);
-			$_SESSION['id'] = $id;
-			$this->view->location('../admin/edit');
-		}
-
-		$this->view->render('Edit Enter');
-	}
-
-	public function button_enter_editAction() // Вход в режим редактора через кнопку
-	{
-		if (!empty($_POST)){
-			$id = $this->model->enterEdit($_POST);
-			$_SESSION['id'] = $id;
-			$this->view->redirect('../admin/edit');
-		}
-	}
-
-	public function editAction()// Редактор поста
-	{	
-		$result = $this->model->getPost();
+		$result = $this->model->getProducts();
 		$vars = [
-			'posts' => $result,
+			'product' => $result,
+		];
+		$this->view->render('Prodcuts', $vars);
+	}
+
+	public function oneProductAction() // Полный обзор одного выбраного поста
+	{	
+		$result = $this->model->getProduct($_POST['id']);
+		$vars = [
+			'product' => $result,
+		];
+		$this->view->render('Prodcut', $vars);
+	}
+
+	public function addProductAction()// Добавление новых постов
+	{	
+		if ($_POST != []) {
+			$this->model->addAdmin($_POST);
+			$this->view->message('success', 'Your product added');
+		}	
+
+		$result = $this->model->getAllCategory();
+		$vars = [
+			'cats' => $result,
 		];
 
-		if (!empty($_POST)){
-			$this->model->editPost($_POST);
-			$this->view->message('success', 'datas edit');
-		}
+		$this->view->render('Add', $vars);
+	}
 
+	public function editProductAction()// Изменение продукта
+	{
+		$result = $this->model->getProduct($_POST['id']);
+		$vars = [
+			'product' => $result,
+		];
+		if (count($_POST) >= 2) {
+			$this->model->editAdmin($_POST);
+			$this->view->redirect('/admin/products');
+		}
 		$this->view->render('Edit', $vars);
 	}
 
-	public function admin_postAction() // Ввывод всех постов сокращеном варианте
-	{	
-		$result = $this->model->getAllPosts();
-		$vars = [
-			'posts' => $result,
-		];
-		$this->view->render('Post', $vars);
-	}
-
-	public function text_postAction() // Полный обзор одного выбраного поста
-	{	
-		$result = $this->model->getFullPosts($_POST['idpost']);
-		$comment = $this->model->getComent($_POST['idpost']);
-		$vars = [
-			'posts' => $result,
-			'comments' => $comment,
-		];
-		$this->view->render('Text post', $vars);
-	}
-
-	public function deleteAction() // Удаление через навигацию
-	{	
-		if (!empty($_POST)) {
-			$this->model->emptyFields($_POST);
-			$this->model->deletePost($_POST);
-			$this->view->message('success','This post was deleted');
-		}
-		
-		$this->view->render('Delete');
-	}
-
-	public function delete_buttonAction() // Удаление через кнопку
-	{	
-		if (!empty($_POST)) {
-			$this->model->deletePost($_POST);
-			$this->view->redirect('/admin/post');
-		}
-	}
-
-	public function deleteCommentAction()
+	public function deleteProductAction()// Удаление продутка
 	{
-		$this->model->deleteComm($_POST);
-		?> <script type="text/javascript">window.history.back()</script><?
+		if (!empty($_POST)) {
+			$this->model->delete($_POST, 'product');
+			$this->view->redirect('/admin/products');
+		}
+	}
+
+	public function searchAdminAction()
+	{
+		$result = $this->model->searchSimilar($_POST['search']);
+		$vars = [
+			'product' => $result,
+		];
+		$this->view->render('Admin', $vars);
+	}
+
+	public function addCategoryAction()
+	{
+		if ($_POST != []) {
+			$this->model->addCat($_POST);
+			$this->view->message('success', 'New category added');
+		}	
+
+		$this->view->render('Category Add');
+	}
+
+	public function categoryAdminAction()
+	{
+		$result = $this->model->getAllCategory();
+		$vars = [
+			'cats' => $result,
+		];
+
+		$this->view->render('Category', $vars);
+	}
+
+	public function catAdminAction()
+	{
+		$result = $this->model->getProductsCategory($_POST['cat']);
+		$vars = [
+			'product' => $result,
+		];
+		$this->view->render('Category', $vars);
+	}
+
+	public function editCatAction()
+	{
+		$result = $this->model->getOneCategory($_POST['id']);
+		$vars = [
+			'cats' => $result,
+		];
+
+		if (count($_POST) >= 2) {
+			$this->model->editCatAdmin($_POST);
+			$this->view->redirect('/admin/category');
+		}
+		$this->view->render('Category', $vars);
+	}
+
+	public function deleteCatAction()
+	{
+		if (!empty($_POST)) {
+			$this->model->delete($_POST, 'category');
+			$this->view->redirect('/admin/category');
+		}
 	}
 
 	public function logoutAction()
@@ -132,5 +148,6 @@ class AdminController extends Controller
 		unset($_SESSION['admin']);
 		$this->view->redirect('/');
 	}
+
 
 }

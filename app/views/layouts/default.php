@@ -9,29 +9,58 @@
 </head>
 <body>
 
-	<div class="myheader">
-		<div class="my_meny"> 
-		<a class="nav-link active fs-4" style="margin-left: 2vw; margin-top: 1vh;" href="/">All Posts</a>
+	<nav class="navbar navbar-expand-lg navbar-light bg-light" style="width: 100vw; height: 10vh;">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="/" style="margin-left: 10vw;">OStore</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/">Home</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/category">Category</a>
+					</li>
 
-		<?php if (isset($_SESSION['auth'])): ?>
-			<a class="nav-link active fs-4" style="margin-top: 1vh;" href="/account/myposts">My Posts</a>
-			<a class="nav-link active fs-4" style="margin-top: 1vh;" href="/account/addpost">Add Post</a>
-		<?php endif ?>
+					<?php if (isset($_SESSION['auth'])): ?>
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/account/myproduct">My product</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/account/add">Add product</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/account/settings">Account</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/account/exit">Exit</a>
+					</li>
 
-		<?php if (isset($_SESSION['auth'])): ?>
-			<a class="nav-link active fs-4"  style="margin-left: 65vw; margin-top: 1vh;" href="/exit">Exit</a>
-		<?php else: ?>
-			<a class="nav-link active fs-4"  style="margin-left: 75vw; margin-top: 1vh;" href="/register">Register</a>
-			<a class="nav-link active fs-4" style="margin-top: 1vh;" href="/enter">Enter</a>
-		<?php endif ?>
+					<?php else: ?>
+						
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/register">Register</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/enter">Enter</a>
+					</li>
+					<?php endif ?>
+					
+				</ul>
+				<form class="d-flex" action="/search" method="post" style="margin-right: 10vw;">
+					<input class="form-control me-2" type="text" name="search" placeholder="Search" aria-label="Search">
+					<button class="btn btn-outline-success" type="submit">Search</button>
+				</form>
+			</div>
 		</div>
+	</nav>
+
+	<div class="my_content">
+		<?php echo $content;?>
 	</div>
-
-
-	<div class="mydefault_content">
-
-	<?php echo $content;?>
 	
-	</div>
+
 </body>
 </html>

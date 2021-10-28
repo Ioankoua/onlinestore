@@ -7,13 +7,14 @@ use app\lib\Db;
 
 class AuthController extends Controller
 {
-	public function registerAction() // Проводим регистрацию и редеректим на вход
+	public function registerAction() // Проводим регистрацию 
 	{
-		$id = $this->model->registrait($_POST); // 
+		$id = $this->model->registrait($_POST); 
 
 		if ($id != false) {
 			$name = $this->model->getName($id);
 			$_SESSION['auth'] = $name;
+			$_SESSION['userid'] = $id;
 			$this->view->location('/');
 		}
 
@@ -28,6 +29,7 @@ class AuthController extends Controller
 			if ($id != false) {
 				$name = $this->model->getName($id);
 				$_SESSION['auth'] = $name;
+				$_SESSION['userid'] = $id;
 				$this->view->location('/');
 			}else{
 				$this->view->message('error', 'Incorrect login or password');

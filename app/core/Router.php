@@ -4,27 +4,25 @@ namespace app\core;
 
 use app\core\View;
 
-class Router  
-{
-	protected $routes = [];
-	protected $params = [];
+class Router {
 
-	public function __construct()
-	{
-		$arr = require 'app/config/routes.php';
-		foreach ($arr as $key => $val) {
-			$this->add($key, $val);
-		}
-	}
+    protected $routes = [];
+    protected $params = [];
+    
+    public function __construct() {
+        $arr = require 'app/config/routes.php';
+        foreach ($arr as $key => $val) {
+            $this->add($key, $val);
+        }
+    }
 
-	public function add($route, $params)
-	{
-		$route = '#^'.$route.'$#';
-		$this->routes[$route] = $params;
-	}
+    public function add($route, $params) {
+        $route = preg_replace('/{([a-z]+):([^\}]+)}/', '(?P<\1>\2)', $route);
+        $route = '#^'.$route.'$#';
+        $this->routes[$route] = $params;
+    }
 
-	//Проверяет существет ли такой роут
-	public function match() {
+    public function match() {
         $url = trim($_SERVER['REQUEST_URI'], '/');
         foreach ($this->routes as $route => $params) {
             if (preg_match($route, $url, $matches)) {
@@ -40,26 +38,28 @@ class Router
                 return true;
             }
         }
-        return false;
+        $this->params['controller'] = 'main';
+        $this->params['action'] = 'product';
+        return true;
     }
-	//Если роут сущетсвуем запускаем его
-	public function run()
-	{
-		if ($this->match()){
-		$path = 'app\controllers\\'.ucfirst($this->params['controller']).'Controller';
-			if (class_exists($path)) {
-				$action = $this->params['action'].'Action';
-				if (method_exists($path, $action)) {
-					$controller = new $path($this->params);
-					$controller->$action();
-				}else{
-					View::errorCode(404);
-				}
-			}else{
-				View::errorCode(404);
-			}
-		}else{
-			View::errorCode(404);
-		}
-	}
+
+    public function run(){
+        if ($this->match()) {
+            $path = 'app\controllers\\'.ucfirst($this->params['controller']).'Controller';
+            if (class_exists($path)) {
+                $action = $this->params['action'].'Action';
+                if (method_exists($path, $action)) {
+                    $controller = new $path($this->params);
+                    $controller->$action();
+                } else {
+                    View::errorCode(404);
+                }
+            } else {
+                View::errorCode(404);
+            }
+        } else {
+            View::errorCode(404);
+        }
+    }
+
 }

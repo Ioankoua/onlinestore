@@ -7,82 +7,83 @@ use app\lib\Db;
 
 class UserController extends Controller
 {
-	/*public function __construct($route)
+	public function addProductAction()
 	{
-		parent::__construct($route);
-		$this->view->layout = 'admin_template';
-	}*/
+		$cats = $this->model->getAllCategory();
 
-	public function addpostAction()// Добавление новых постов
-	{	
-		if (!empty($_POST)){
-			$this->model->postValidate($_POST);
-			$id = $this->model->postAdd($_POST);
-			if (!$id) {
-				$this->view->message('error', 'Picture no add');
-			}
-			$this->model->addimg($_FILES['img']['tmp_name'], $id);
-
-			$this->view->message('success', 'post add');
-		}
-
-		$this->view->render('Add');
-	}
-
-	public function buttoneditAction() // Вход в режим редактора через кнопку
-	{
-		if (!empty($_POST)){
-			$id = $this->model->enterEdit($_POST);
-			$_SESSION['id'] = $id;;
-			$this->view->redirect('/account/editpost');
-		}
-	}
-
-	public function editpostAction()// Редактор поста
-	{	
-		$result = $this->model->getPost();
 		$vars = [
-			'posts' => $result,
+			'cats' => $cats,
 		];
 
-		if (!empty($_POST)){
-			$this->model->editPost($_POST);
-			$this->view->message('success', 'datas edit');
-		}
+		if ($_POST != []) {
+			$id = $this->model->addUser($_POST);
+			$this->view->message('success', 'Your product added');
+		}	
 
+		$this->view->render('Add', $vars);
+	}
+
+	public function myProductAction()
+	{
+		$id = $_SESSION['userid'];
+		$result = $this->model->getMyProducts($id);
+		$cats = $this->model->getMyCategory($id);
+		$vars = [
+			'product' => $result,
+			'cats' => $cats,
+		];
+		$this->view->render('Products', $vars);
+	}
+
+	public function myProductCatAction()
+	{
+		$result = $this->model->getMyProductsCategory($_POST['cat'], $_POST['id']);
+		$cats = $this->model->getMyCategory($_SESSION['userid']);
+		$vars = [
+			'product' => $result,
+			'cats' => $cats,
+		];
+		$this->view->render('Category', $vars);
+	}
+
+	public function editProductAction()
+	{
+		$result = $this->model->getProduct($_POST['id']);
+		$vars = [
+			'product' => $result,
+		];
+		if (count($_POST) >= 2) {
+			$this->model->editProduct($_POST);
+			$this->view->redirect('/account/myproduct');
+		}
 		$this->view->render('Edit', $vars);
 	}
 
-	public function mypostsAction() // Ввывод всех постов сокращеном варианте
-	{	
-		$result = $this->model->getMyPosts();
-		$vars = [
-			'posts' => $result,
-		];
-		$this->view->render('Post', $vars);
-	}
-
-	public function fullpostAction() // Полный обзор одного выбраного поста
-	{	
-		$result = $this->model->getFullPosts($_POST['idpost']);
-		$comment = $this->model->getComent($_POST['idpost']);
-		$vars = [
-			'posts' => $result,
-			'comments' => $comment,
-		];
-		$this->view->render('Text post', $vars);
-	}
-
-	public function deletepostAction() // Удаление через кнопку
-	{	
+	public function deleteProductAction()
+	{
 		if (!empty($_POST)) {
-			$this->model->deletePost($_POST);
-			$this->view->redirect('/account/myposts');
+			$this->model->deleteProd($_POST);
+			$this->view->redirect('/account/myproduct');
 		}
 	}
 
-	public function logoutAction()
-	{	
+	public function personalSettingsAction()
+	{
+		$result = $this->model->getUserData($_SESSION['userid']);
+		$vars = [
+			'data' => $result,
+		];
+
+		if (count($_POST) == 4) {
+			$this->model->getUpdateData($_POST, $result);
+			$this->view->message('success', 'Data changed');
+		}
+
+		$this->view->render('Category', $vars);
+	}
+
+	public function exitAccAction()
+	{
 		unset($_SESSION['auth']);
 		$this->view->redirect('/');
 	}

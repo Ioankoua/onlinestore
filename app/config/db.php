@@ -2,7 +2,7 @@
 
 return [
 	'host' => 'localhost',
-	'db_name' => 'blog_bd',
+	'db_name' => 'ostore',
 	'user' => 'root',
 	'password' => 'root',
 ];

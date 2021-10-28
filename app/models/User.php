@@ -7,105 +7,109 @@ use app\core\Model;
 class User extends Model
 {
 
-	public function getMyPosts()
+	public function getMyProducts($id)
     {
-      $author = $_SESSION['auth'];	
-      return $this->db->findall("SELECT id, name, description, text, goodlike, dislike, author FROM posts WHERE author = '$author' ORDER BY id DESC;");
+      return $this->db->findall("SELECT * FROM product WHERE userid = '$id' ORDER BY id DESC;");
     }
 
-    public function getFullPosts($id)
+    public function getProduct($id)
     {
-      return $this->db->findall("SELECT id, name, description, text, goodlike, dislike, author FROM posts WHERE id = '$id'");
+      return $this->db->findall("SELECT * FROM product WHERE id = '$id'");
     }
 
-    public function getPost()// Берет один пост через сесию
-	{
-		$id = $_SESSION['id']; 
-		return $this->db->findall("SELECT name, description, text, goodlike, dislike, author FROM posts WHERE id = '$id'");
-	}
+    public function getUserData($id)
+    {
+      return $this->db->findall("SELECT * FROM users WHERE id = '$id'");
+    }
 
-	public function getComent($ispost)
+	public function emptyFields($title, $smallD, $fullD, $price, $category)
 	{
-	  return  $this->db->findall("SELECT id, author, message, ispost FROM comments WHERE ispost = '$ispost'");
-	}
+		if (!empty($title) && !empty($smallD) && !empty($fullD) && !empty($price) && !empty($category)){
 
-	public function postValidate($post) 
-	{
-		$nameLen = iconv_strlen($post['name']);
-		$descriptionLen = iconv_strlen($post['description']);
-		$textLen = iconv_strlen($post['text']);
-		
-		$this->db->nameValidate($nameLen);
-		$this->db->descriptionValidate($descriptionLen);
-		$this->db->textValidate($textLen);
-		
-		if (empty($_FILES['img']['tmp_name'])) {
-			$this->db->message('error', 'Need picture');
-			return false;
+		}else{
+			$this->db->message('error', 'Empty fields');
 		}
-		
-		return true;
-	}
+	} 
 
-	public function postAdd($post) 
-	{		
-		$lastid = $this->db->getMaxIdPlus('posts');
+	public function getAllCategory()
+    {
+        return $this->db->findall('SELECT * FROM category ORDER BY id DESC;');
+    }
 
-		$params = [
-			'id' => $lastid,
-			'author' => $_SESSION['auth'],
-			'name' => $post['name'],
-			'description' => $post['description'],
-			'goodlike' => '0',
-			'goodlike' => '0',
-			'text' => $post['text'],
-		];
-		$this->db->query('INSERT INTO `posts` VALUES (:id, :author, :name, :description, :goodlike, :goodlike, :text)', $params);
-		return $this->db->lastInsertId();
-	}
+    public function getMyCategory($id)
+    {
+    	return $this->db->findall("SELECT DISTINCT cat FROM product WHERE userid = '$id' ORDER BY id DESC;");
+    }
 
-	public function addimg($path, $id)
+    public function getMyProductsCategory($cat, $id)
+    {
+        return $this->db->findall("SELECT * FROM product WHERE cat = '$cat' AND userid = '$id' ORDER BY id DESC;");
+    }
+
+	public function addUser($post)// проводим валидацию и отправляем данные в бд
 	{
-		move_uploaded_file($path, 'public/img/'.$id.'.jpg');
+		$this->db->addProductToDb($post, $_SESSION['userid']);
 	}
 
-	public function deletePost($post)
+    public function deleteProd($post)
 	{
 		$id = $post['id'];
 
 		if (!empty($id)) {
-			$result = $this->db->getId('posts', $id);
+			$result = $this->db->getId('product', $id);
 			if ($result == true) {
-				$this->db->deleteColum('posts', $id);
+				$this->db->deleteColum('product', $id);
 			}else{
 				$this->db->message('error', 'No such id exists');
 			}			
 		}
 	}
 
-	public function enterEdit($post)
+	public function editProduct($post)
 	{
-		$id = $post['id'];
-		if (!empty($id)) {
-			$result = $this->db->getId('posts', $id);
-			if ($result == true) {
-				return $id;
-			}else{
-				$this->db->message('error', 'No such id exists');
-			}			
+		$this->db->editDbProduct($post);	
+	}
+
+	public function getUpdateData($post, $userdata)
+    {
+    	$count = 0;
+
+		$id = $userdata['0']['id'];
+		$name = $post['username'];
+		$email = $post['email'];
+		$login = $post['login'];
+		$password = $post['password'];
+
+		if ($name != $userdata['0']['username']) {
+			$this->db->validate_name($post['username']);
+			$this->db->update('users', 'username', $name, $id);
+			$count++;
 		}
-	}
 
-	public function editPost($post)
-	{
-		$id = $_SESSION['id']; 
-		$name = $post['name'];
-		$description = $post['description'];
-		$text = $post['text'];
+		if ($email != $userdata['0']['email']) {
+			$this->db->validate_mail($post['email']);
+			$this->db->update('users', 'email', $email, $id);
+			$count++;
+		}
 
-		$this->db->editName($name, $id);
-		$this->db->editDescription($description, $id);
-		$this->db->editText($text, $id);		
-	}
-		
+		if ($login != $userdata['0']['login']) {
+			$this->db->validate_login($post['login']);
+			$this->db->update('users', 'login', $login, $id);
+			$count++;
+		}
+
+		if ($password != $userdata['0']['password']) {
+			$this->db->validate_password($post['password']);
+			$this->db->update('users', 'password', $password, $id);
+			$count++;
+		}
+
+		if ($count == 0) {
+			$this->db->message('error', 'Nothing has changed');
+		}
+
+    }
+
+
+
 }
